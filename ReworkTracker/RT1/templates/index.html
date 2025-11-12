@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rework Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+    async function loadFGList() {
+        const res = await fetch('/get_fg_list');
+        const list = await res.json();
+        const select = document.getElementById('fg_assert');
+        list.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item;
+            opt.textContent = item;
+            select.appendChild(opt);
+        });
+    }
+    window.onload = loadFGList;
+    </script>
+</head>
+<body>
+<div class="container">
+    <h2>🧰 Rework Tracker</h2>
+    <form action="/add" method="post" class="form-grid">
+
+        <label>Customer:</label>
+        <input type="text" name="customer" required>
+
+        <label>FG Assert:</label>
+        <input list="fg_assert" name="fg_assert" id="fg_assert" placeholder="Type or select" required>
+        <datalist id="fg_assert"></datalist>
+
+        <label>Side:</label>
+        <select name="side" required>
+            <option value="">Select</option>
+            <option>Top</option>
+            <option>Bot</option>
+        </select>
+
+        <label>Line:</label>
+        <select name="line" required>
+            <option>Line1</option>
+            <option>Line2</option>
+            <option>Line3</option>
+            <option>Line4</option>
+            <option>Line5</option>
+        </select>
+
+        <label>Shift:</label>
+        <select name="shift" required>
+            <option>A</option>
+            <option>B</option>
+            <option>C</option>
+        </select>
+
+        <label>Board Serial No:</label>
+        <input type="text" name="board_serial" required>
+
+        <label>Rework Location:</label>
+        <input type="text" name="rework_location" required>
+
+        <label>Defect Type:</label>
+        <select name="defect_type" required>
+            <option>Component Shift</option>
+            <option>Missing</option>
+            <option>Bridging</option>
+        </select>
+
+        <label>Operator ID:</label>
+        <input type="text" name="operator_id" required>
+
+        <label>Board Status:</label>
+        <select name="board_status" required>
+            <option>Rework Pending</option>
+            <option>Rework Completed</option>
+        </select>
+
+        <label>Remarks:</label>
+        <input type="text" name="remarks" placeholder="Optional">
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <hr>
+
+    <h3>📋 Rework History</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Customer</th><th>FG Assert</th><th>Side</th><th>Board Serial No</th>
+                <th>Rework Location</th><th>Defect Type</th><th>Line</th><th>Operator ID</th>
+                <th>Shift</th><th>Rework In</th><th>Rework Out</th><th>Board Status</th><th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in data %}
+        <tr>
+            <td>{{ row.customer }}</td>
+            <td>{{ row.fg_assert }}</td>
+            <td>{{ row.side }}</td>
+            <td>{{ row.board_serial }}</td>
+            <td>{{ row.rework_location }}</td>
+            <td>{{ row.defect_type }}</td>
+            <td>{{ row.line }}</td>
+            <td>{{ row.operator_id }}</td>
+            <td>{{ row.shift }}</td>
+            <td>{{ row.rework_in }}</td>
+            <td>{{ row.rework_out }}</td>
+            <td>{{ row.board_status }}</td>
+            <td>{{ row.remarks }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

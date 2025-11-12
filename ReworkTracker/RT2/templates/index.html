@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rework Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f2f4f6; }
+        header { background: #004aad; color: white; padding: 15px 25px; font-size: 22px; }
+        .container { padding: 20px 40px; }
+        form { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        label { font-weight: bold; }
+        input, select { padding: 6px; border-radius: 5px; border: 1px solid #aaa; }
+        button { background: #007bff; color: white; padding: 10px; border: none; border-radius: 6px; cursor: pointer; grid-column: span 4; }
+        button:hover { background: #005dc1; }
+        table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background: #e9eef3; }
+        .status-form { display: inline; }
+        .export-btn { background: green; float: right; }
+    </style>
+</head>
+<body>
+<header>🧰 Rework Tracker</header>
+<div class="container">
+
+<form action="/add" method="post">
+    <label>Customer</label>
+    <input list="customer_list" name="customer" required>
+    <datalist id="customer_list">
+        {% for c in customers %}<option value="{{ c }}">{% endfor %}
+    </datalist>
+
+    <label>FG Assert</label>
+    <input list="fg_list" name="fg_assert" required>
+    <datalist id="fg_list">
+        {% for f in fgs %}<option value="{{ f }}">{% endfor %}
+    </datalist>
+
+    <label>Side</label>
+    <select name="side" required><option>Top</option><option>Bot</option></select>
+
+    <label>Line</label>
+    <select name="line" required><option>Line1</option><option>Line2</option><option>Line3</option><option>Line4</option><option>Line5</option></select>
+
+    <label>Shift</label>
+    <select name="shift" required><option>A</option><option>B</option><option>C</option></select>
+
+    <label>Board Serial No</label>
+    <input type="text" name="board_serial" required>
+
+    <label>Rework Location</label>
+    <input type="text" name="rework_location" required>
+
+    <label>Defect Type</label>
+    <input list="defect_list" name="defect_type" required>
+    <datalist id="defect_list">
+        {% for d in defects %}<option value="{{ d }}">{% endfor %}
+    </datalist>
+
+    <label>Operator ID</label>
+    <input type="text" name="operator_id" required>
+
+    <label>Board Status</label>
+    <select name="board_status" required>
+        <option>Rework Pending</option>
+        <option>Rework Completed</option>
+    </select>
+
+    <label>Remarks</label>
+    <input type="text" name="remarks" placeholder="Optional">
+
+    <button type="submit">Add Record</button>
+</form>
+
+<h3 style="margin-top:40px;">📋 Rework Records
+    <a href="/export_excel"><button class="export-btn">⬇️ Download Excel</button></a>
+</h3>
+
+<table>
+<thead>
+<tr>
+    <th>ID</th><th>Customer</th><th>FG Assert</th><th>Side</th><th>Board Serial</th>
+    <th>Rework Location</th><th>Defect</th><th>Line</th><th>Operator</th>
+    <th>Shift</th><th>Rework In</th><th>Rework Out</th><th>Board Status</th><th>Remarks</th>
+</tr>
+</thead>
+<tbody>
+{% for r in data %}
+<tr>
+    <td>{{ r.id }}</td>
+    <td>{{ r.customer }}</td>
+    <td>{{ r.fg_assert }}</td>
+    <td>{{ r.side }}</td>
+    <td>{{ r.board_serial }}</td>
+    <td>{{ r.rework_location }}</td>
+    <td>{{ r.defect_type }}</td>
+    <td>{{ r.line }}</td>
+    <td>{{ r.operator_id }}</td>
+    <td>{{ r.shift }}</td>
+    <td>{{ r.rework_in }}</td>
+    <td>{{ r.rework_out or '-' }}</td>
+    <td>
+        <form action="/update_status/{{ r.id }}" method="post" class="status-form">
+            <select name="board_status" onchange="this.form.submit()">
+                <option {% if r.board_status == 'Rework Pending' %}selected{% endif %}>Rework Pending</option>
+                <option {% if r.board_status == 'Rework Completed' %}selected{% endif %}>Rework Completed</option>
+            </select>
+        </form>
+    </td>
+    <td>{{ r.remarks }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</body>
+</html>
